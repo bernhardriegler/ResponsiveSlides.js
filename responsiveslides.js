@@ -17,6 +17,7 @@
       "speed": 500,             // Integer: Speed of the transition, in milliseconds
       "timeout": 4000,          // Integer: Time between slide transitions, in milliseconds
       "pager": false,           // Boolean: Show pager, true or false
+      "namedPager": false,      // Boolean: Show named pager (by img alt), true or false
       "nav": false,             // Boolean: Show navigation, true or false
       "random": false,          // Boolean: Randomize the order of the slides, true or false
       "pause": false,           // Boolean: Pause on hover, true or false
@@ -198,6 +199,27 @@
           }
         }
 
+        // namedPager
+        if (settings.namedPager && !settings.manualControls) {
+          var tabMarkup = [];
+          $slide.each(function (i) {
+            var n = i + 1;
+            var currentSlideClass = slideClassPrefix + i;
+            tabMarkup +=
+              "<li>" +
+              "<a href='#' class='" + currentSlideClass + "'>" + $('#' + currentSlideClass + ' img').attr('alt') + "</a>" +
+              "</li>";
+          });
+          $pager.append(tabMarkup);
+
+          // Inject pager
+          if (options.navContainer) {
+            $(settings.navContainer).append($pager);
+          } else {
+            $this.after($pager);
+          }
+        }
+
         // Manual pager controls
         if (settings.manualControls) {
           $pager = $(settings.manualControls);
@@ -205,14 +227,14 @@
         }
 
         // Add pager slide class prefixes
-        if (settings.pager || settings.manualControls) {
+        if (settings.pager || settings.manualControls || settings.namedPager) {
           $pager.find('li').each(function (i) {
             $(this).addClass(slideClassPrefix + (i + 1));
           });
         }
 
         // If we have a pager, we need to set up the selectTab function
-        if (settings.pager || settings.manualControls) {
+        if (settings.pager || settings.manualControls || settings.namedPager) {
           $tabs = $pager.find('a');
 
           // Select pager item
@@ -237,7 +259,7 @@
               var idx = index + 1 < length ? index + 1 : 0;
 
               // Remove active state and set new if pager is set
-              if (settings.pager || settings.manualControls) {
+              if (settings.pager || settings.manualControls || settings.namedPager) {
                 selectTab(idx);
               }
 
@@ -269,7 +291,7 @@
         }
 
         // Pager click event handler
-        if (settings.pager || settings.manualControls) {
+        if (settings.pager || settings.manualControls || settings.namedPager) {
           $tabs.bind("click", function (e) {
             e.preventDefault();
 
@@ -348,7 +370,7 @@
 
             // Go to slide
             slideTo($(this)[0] === $prev[0] ? prevIdx : nextIdx);
-            if (settings.pager || settings.manualControls) {
+            if (settings.pager || settings.manualControls || settings.namedPager) {
               selectTab($(this)[0] === $prev[0] ? prevIdx : nextIdx);
             }
 
